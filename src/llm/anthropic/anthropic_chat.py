@@ -52,7 +52,7 @@ def extract_reply(response: dict) -> str:
 
 
 def main() -> int:
-    api_key = os.getenv("CLAUDE_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
         print("Missing ANTHROPIC_API_KEY env var.")
         print("Set it and re-run, e.g.: setx ANTHROPIC_API_KEY your_key")
