@@ -11,6 +11,7 @@ Contents
 - src/llm/anthropic/anthropic_chat.py: minimal Anthropic Messages API chat loop.
 - src/llm/openrouter/openrouter_chat.py: minimal OpenRouter chat loop.
 - src/llm/google/google_ai_studio.py: list available Google AI Studio models.
+- src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
 
 Requirements
 ------------
@@ -19,6 +20,7 @@ Requirements
 - Dependencies:
 	- python-dotenv
 	- google-genai (only required for the Google AI Studio script)
+	- pypandoc-binary (required for Markdown -> DOCX conversion)
 
 Setup
 -----
@@ -27,6 +29,7 @@ Setup
 2) Install dependencies (pip example):
 
 	pip install python-dotenv google-genai
+	pip install pypandoc-binary
 
 	Or use poetry/uv/pip with pyproject.toml as needed.
 
@@ -63,6 +66,10 @@ OpenRouter chat:
 Google AI Studio model list:
 
 	python src/llm/google/google_ai_studio.py
+
+Markdown to DOCX:
+
+	python src/docs/markdown_to_docx.py path/to/file.md -o path/to/file.docx
 
 Notes
 -----
