@@ -12,6 +12,7 @@ Contents
 - src/llm/openrouter/openrouter_chat.py: minimal OpenRouter chat loop.
 - src/llm/google/google_ai_studio.py: list available Google AI Studio models.
 - src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
+- src/docs/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
 
 Requirements
 ------------
@@ -21,6 +22,7 @@ Requirements
 	- python-dotenv
 	- google-genai (only required for the Google AI Studio script)
 	- pypandoc-binary (required for Markdown -> DOCX conversion)
+	- pypdf (required for PDF -> text extraction)
 
 Setup
 -----
@@ -70,6 +72,10 @@ Google AI Studio model list:
 Markdown to DOCX:
 
 	python src/docs/markdown_to_docx.py path/to/file.md -o path/to/file.docx
+
+PDF to text:
+
+	python src/docs/pdf_to_text.py path/to/file.pdf -o path/to/file.txt
 
 Notes
 -----
