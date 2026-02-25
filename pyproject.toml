@@ -6,5 +6,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "pypandoc-binary>=1.13",
+    "pypdf>=5.9.0",
     "python-dotenv>=1.2.1",
 ]

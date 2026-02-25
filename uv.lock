@@ -17,6 +17,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pypdf"
+version = "6.7.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/9b/63e767042fc852384dc71e5ff6f990ee4e1b165b1526cf3f9c23a4eebb47/pypdf-6.7.3.tar.gz", hash = "sha256:eca55c78d0ec7baa06f9288e2be5c4e8242d5cbb62c7a4b94f2716f8e50076d2", size = 5303304, upload-time = "2026-02-24T17:23:11.42Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b0/90/3308a9b8b46c1424181fdf3f4580d2b423c5471425799e7fc62f92d183f4/pypdf-6.7.3-py3-none-any.whl", hash = "sha256:cd25ac508f20b554a9fafd825186e3ba29591a69b78c156783c5d8a2d63a1c0a", size = 331263, upload-time = "2026-02-24T17:23:09.932Z" },
+]
+
+[[package]]
 name = "python-dotenv"
 version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -31,11 +40,13 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "pypandoc-binary" },
+    { name = "pypdf" },
     { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pypandoc-binary", specifier = ">=1.13" },
+    { name = "pypdf", specifier = ">=5.9.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
 ]
