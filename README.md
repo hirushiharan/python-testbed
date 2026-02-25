@@ -13,6 +13,7 @@ Contents
 - src/llm/google/google_ai_studio.py: list available Google AI Studio models.
 - src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
 - src/docs/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
+- src/docs/extracted_text_to_json.py: convert extracted .txt content to structured JSON text.
 
 Requirements
 ------------
@@ -76,6 +77,10 @@ Markdown to DOCX:
 PDF to text:
 
 	python src/docs/pdf_to_text.py path/to/file.pdf -o path/to/file.txt
+
+Extracted text to JSON:
+
+	python src/docs/extracted_text_to_json.py path/to/file.txt -o path/to/file.json
 
 Notes
 -----
