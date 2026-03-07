@@ -14,6 +14,7 @@ Contents
 - src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
 - src/docs/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
 - src/docs/extracted_text_to_json.py: convert extracted .txt content to JSON-valid text.
+- src/auth/generate_jwt_secret_key.py: generate a strong SECRET_KEY value for JWT authentication.
 
 Requirements
 ------------
@@ -81,6 +82,10 @@ PDF to text:
 Extracted text to JSON:
 
 	python src/docs/extracted_text_to_json.py path/to/file.txt -o path/to/file.json
+
+Generate JWT SECRET_KEY:
+
+	python src/auth/generate_jwt_secret_key.py --length 80
 
 Notes
 -----
