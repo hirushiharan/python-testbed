@@ -61,6 +61,12 @@ python -m venv .venv
 pip install -e .
 ```
 
+Install development dependencies:
+
+```bash
+pip install -e .[dev]
+```
+
 ## Environment Variables
 
 Copy .env.example to .env and fill in values.
@@ -223,3 +229,64 @@ Rules:
 - The S3 deletion utility is destructive. Always test with --prefix first.
 - Keep API keys in .env, never commit secrets.
 - Run with --verbose when debugging production issues.
+
+## Quality and Validation
+
+Lint all code:
+
+```bash
+ruff check .
+```
+
+Run all tests:
+
+```bash
+pytest -q
+```
+
+Run CLI smoke tests only:
+
+```bash
+pytest -q tests/test_cli_smoke.py
+```
+
+## Pre-commit and Secret Leak Checks
+
+Install git hooks:
+
+```bash
+pre-commit install
+```
+
+Run hooks manually on all files:
+
+```bash
+pre-commit run --all-files
+```
+
+The pre-commit configuration includes:
+
+- File hygiene checks (YAML, TOML, JSON, whitespace)
+- Private key and AWS credential checks
+- detect-secrets scanning for potential secret leaks
+- Gitleaks scanning for additional secret leak detection
+
+## Continuous Integration
+
+GitHub Actions workflow is available at:
+
+- .github/workflows/ci.yml
+
+On push and pull request, CI runs:
+
+1. Ruff lint
+2. CLI smoke tests
+3. pre-commit hooks (including secret scanning)
+
+## Contributing
+
+See CONTRIBUTING.md for development setup, pull request checklist, and contribution process.
+
+## License
+
+This project is licensed under the MIT License. See LICENSE.
