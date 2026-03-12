@@ -14,6 +14,7 @@ Contents
 - src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
 - src/docs/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
 - src/docs/extracted_text_to_json.py: convert extracted .txt content to JSON-valid text.
+- src/docs/delete_s3_bucket_documents.py: delete all objects in an S3 bucket (optionally scoped by prefix).
 - src/auth/generate_jwt_secret_key.py: generate a strong SECRET_KEY value for JWT authentication.
 
 Requirements
@@ -25,6 +26,7 @@ Requirements
 	- google-genai (only required for the Google AI Studio script)
 	- pypandoc-binary (required for Markdown -> DOCX conversion)
 	- pypdf (required for PDF -> text extraction)
+	- boto3 (required for S3 bucket object deletion)
 
 Setup
 -----
@@ -49,6 +51,11 @@ Environment Variables
 - OPENROUTER_MODEL: optional (default: anthropic/claude-4.6-opus).
 
 - GOOGLE_API_KEY: API key for Google AI Studio.
+
+- AWS_ACCESS_KEY_ID: AWS access key for S3 operations.
+- AWS_SECRET_ACCESS_KEY: AWS secret key for S3 operations.
+- AWS_SESSION_TOKEN: optional temporary session token.
+- AWS_REGION: region for S3 operations.
 
 Example .env:
 
@@ -86,6 +93,25 @@ Extracted text to JSON:
 Generate JWT SECRET_KEY:
 
 	python src/auth/generate_jwt_secret_key.py --length 80
+
+Delete all objects from an S3 bucket:
+
+	python src/docs/delete_s3_bucket_documents.py your-bucket-name
+
+Example with environment variables:
+
+	AWS_ACCESS_KEY_ID=your_access_key
+	AWS_SECRET_ACCESS_KEY=your_secret_key
+	AWS_REGION=ap-south-1
+	python src/docs/delete_s3_bucket_documents.py your-bucket-name
+
+Delete objects under a specific prefix:
+
+	python src/docs/delete_s3_bucket_documents.py your-bucket-name --prefix documents/
+
+Skip confirmation prompt:
+
+	python src/docs/delete_s3_bucket_documents.py your-bucket-name --yes
 
 Notes
 -----
