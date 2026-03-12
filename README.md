@@ -16,6 +16,8 @@ Contents
 - src/document_processing/conversion/extracted_text_to_json.py: convert extracted .txt content to JSON-valid text.
 - src/document_processing/storage/delete_s3_bucket_documents.py: delete all objects in an S3 bucket (optionally scoped by prefix).
 - src/security/tokens/generate_jwt_secret_key.py: generate a strong SECRET_KEY value for JWT authentication.
+- src/project_structure/create_structure_from_json.py: create directory/file scaffolding from a JSON definition.
+- src/project_structure/export_project_structure.py: export repository tree to a markdown file, with ignore pattern support.
 
 Requirements
 ------------
@@ -112,6 +114,22 @@ Delete objects under a specific prefix:
 Skip confirmation prompt:
 
 	python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket-name --yes
+
+Create project structure from JSON:
+
+	python src/project_structure/create_structure_from_json.py path/to/structure.json [output_dir]
+
+Export project structure to markdown:
+
+	python src/project_structure/export_project_structure.py [root_dir] -o project_structure.md
+
+Export project structure without gitignore patterns:
+
+	python src/project_structure/export_project_structure.py [root_dir] --no-gitignore
+
+Export project structure with additional ignore patterns:
+
+	python src/project_structure/export_project_structure.py [root_dir] --ignore .venv/ --ignore *.log
 
 Notes
 -----
