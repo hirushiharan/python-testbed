@@ -1,12 +1,25 @@
 [project]
 name = "python-testbed"
 version = "0.1.0"
-description = "Add your description here"
+description = "Public utility scripts for AI providers, document processing, security helpers, and project scaffolding"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "boto3>=1.37.0",
+    "google-genai>=1.30.0",
     "pypandoc-binary>=1.13",
     "pypdf>=5.9.0",
     "python-dotenv>=1.2.1",
 ]
+
+[project.scripts]
+anthropic-chat = "src.ai.providers.anthropic_chat:main"
+openrouter-chat = "src.ai.providers.openrouter_chat:main"
+google-models = "src.ai.providers.google_ai_studio:main"
+markdown-to-docx = "src.document_processing.conversion.markdown_to_docx:main"
+pdf-to-text = "src.document_processing.extraction.pdf_to_text:main"
+text-to-json-string = "src.document_processing.conversion.extracted_text_to_json:main"
+s3-delete-objects = "src.document_processing.storage.delete_s3_bucket_documents:main"
+generate-jwt-secret = "src.security.tokens.generate_jwt_secret_key:main"
+create-structure-from-json = "src.project_structure.create_structure_from_json:main"
+export-project-structure = "src.project_structure.export_project_structure:main"
