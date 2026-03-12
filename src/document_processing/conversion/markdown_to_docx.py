@@ -1,59 +1,79 @@
+"""Convert Markdown documents to DOCX format."""
+
 import argparse
-import pypandoc
+import logging
 import sys
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
 
-def convert_markdown_to_docx(input_path: Path, output_path: Path) -> None:
 
-    if not input_path.exists():
-        raise FileNotFoundError(f"Input file not found: {input_path}")
-    if input_path.suffix.lower() != ".md":
+def configure_logging(verbose: bool) -> None:
+    """Configure console logging for script execution."""
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
+
+
+def convert_markdown_to_docx(markdown_path: Path, docx_path: Path) -> None:
+    """Convert a markdown file into DOCX using pandoc backend."""
+    try:
+        import pypandoc
+    except ImportError as exc:
+        raise RuntimeError(
+            "Missing dependency 'pypandoc-binary'. Install it with: pip install pypandoc-binary"
+        ) from exc
+
+    if not markdown_path.exists():
+        raise FileNotFoundError(f"Input file not found: {markdown_path}")
+    if markdown_path.suffix.lower() != ".md":
         raise ValueError("Input file must be a .md file")
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
+    docx_path.parent.mkdir(parents=True, exist_ok=True)
     pypandoc.convert_file(
-        str(input_path),
+        str(markdown_path),
         to="docx",
         format="md",
-        outputfile=str(output_path),
+        outputfile=str(docx_path),
     )
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description=(
-            "Convert Markdown to DOCX while preserving content and applying formatting "
-            "(tables, symbols, colors) through the DOCX conversion pipeline."
-        )
+        description="Convert a Markdown file (.md) into a Word document (.docx)"
     )
     parser.add_argument("input", type=Path, help="Path to input Markdown (.md) file")
     parser.add_argument(
         "-o",
         "--output",
         type=Path,
-        help="Path to output DOCX file (default: same name as input with .docx)",
+        help="Path to output DOCX file (default: same file name with .docx extension)",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable debug logs",
     )
     return parser.parse_args()
 
 
 def main() -> int:
+    """Run markdown to DOCX conversion command."""
     args = parse_args()
+    configure_logging(verbose=args.verbose)
 
-    input_path = args.input.resolve()
-    output_path = (
-        args.output.resolve() if args.output else input_path.with_suffix(".docx")
-    )
+    markdown_path = args.input.resolve()
+    docx_path = args.output.resolve() if args.output else markdown_path.with_suffix(".docx")
 
     try:
-        convert_markdown_to_docx(input_path, output_path)
-    except (FileNotFoundError, ValueError, RuntimeError) as exc:
-        print(f"Error: {exc}")
+        convert_markdown_to_docx(markdown_path, docx_path)
+    except (FileNotFoundError, ValueError, RuntimeError, OSError) as exc:
+        logger.error("Conversion failed: %s", exc)
         return 1
 
-    print(f"Converted: {input_path}")
-    print(f"Saved DOCX: {output_path}")
+    logger.info("Converted markdown file: %s", markdown_path)
+    logger.info("Saved DOCX file: %s", docx_path)
+    print(f"Saved DOCX: {docx_path}")
     return 0
 
 
