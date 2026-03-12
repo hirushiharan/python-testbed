@@ -8,14 +8,14 @@ via a .env file (loaded by python-dotenv).
 Contents
 --------
 
-- src/llm/anthropic/anthropic_chat.py: minimal Anthropic Messages API chat loop.
-- src/llm/openrouter/openrouter_chat.py: minimal OpenRouter chat loop.
-- src/llm/google/google_ai_studio.py: list available Google AI Studio models.
-- src/docs/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
-- src/docs/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
-- src/docs/extracted_text_to_json.py: convert extracted .txt content to JSON-valid text.
-- src/docs/delete_s3_bucket_documents.py: delete all objects in an S3 bucket (optionally scoped by prefix).
-- src/auth/generate_jwt_secret_key.py: generate a strong SECRET_KEY value for JWT authentication.
+- src/ai/providers/anthropic_chat.py: minimal Anthropic Messages API chat loop.
+- src/ai/providers/openrouter_chat.py: minimal OpenRouter chat loop.
+- src/ai/providers/google_ai_studio.py: list available Google AI Studio models.
+- src/document_processing/conversion/markdown_to_docx.py: convert Markdown files to DOCX while preserving content and applying document formatting.
+- src/document_processing/extraction/pdf_to_text.py: extract text from a PDF file and print or save as .txt.
+- src/document_processing/conversion/extracted_text_to_json.py: convert extracted .txt content to JSON-valid text.
+- src/document_processing/storage/delete_s3_bucket_documents.py: delete all objects in an S3 bucket (optionally scoped by prefix).
+- src/security/tokens/generate_jwt_secret_key.py: generate a strong SECRET_KEY value for JWT authentication.
 
 Requirements
 ------------
@@ -68,56 +68,54 @@ Usage
 
 Anthropic chat:
 
-	python src/llm/anthropic/anthropic_chat.py
+	python src/ai/providers/anthropic_chat.py
 
 OpenRouter chat:
 
-	python src/llm/openrouter/openrouter_chat.py
+	python src/ai/providers/openrouter_chat.py
 
 Google AI Studio model list:
 
-	python src/llm/google/google_ai_studio.py
+	python src/ai/providers/google_ai_studio.py
 
 Markdown to DOCX:
 
-	python src/docs/markdown_to_docx.py path/to/file.md -o path/to/file.docx
+	python src/document_processing/conversion/markdown_to_docx.py path/to/file.md -o path/to/file.docx
 
 PDF to text:
 
-	python src/docs/pdf_to_text.py path/to/file.pdf -o path/to/file.txt
+	python src/document_processing/extraction/pdf_to_text.py path/to/file.pdf -o path/to/file.txt
 
 Extracted text to JSON:
 
-	python src/docs/extracted_text_to_json.py path/to/file.txt -o path/to/file.json
+	python src/document_processing/conversion/extracted_text_to_json.py path/to/file.txt -o path/to/file.json
 
 Generate JWT SECRET_KEY:
 
-	python src/auth/generate_jwt_secret_key.py --length 80
+	python src/security/tokens/generate_jwt_secret_key.py --length 80
 
 Delete all objects from an S3 bucket:
 
-	python src/docs/delete_s3_bucket_documents.py your-bucket-name
+	python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket-name
 
 Example with environment variables:
 
 	AWS_ACCESS_KEY_ID=your_access_key
 	AWS_SECRET_ACCESS_KEY=your_secret_key
 	AWS_REGION=ap-south-1
-	python src/docs/delete_s3_bucket_documents.py your-bucket-name
+	python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket-name
 
 Delete objects under a specific prefix:
 
-	python src/docs/delete_s3_bucket_documents.py your-bucket-name --prefix documents/
+	python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket-name --prefix documents/
 
 Skip confirmation prompt:
 
-	python src/docs/delete_s3_bucket_documents.py your-bucket-name --yes
+	python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket-name --yes
 
 Notes
 -----
 
 - The Anthropic and OpenRouter scripts are synchronous and use urllib.
-- The Anthropic script prints an error message mentioning ANTHROPIC_API_KEY,
-  but it currently reads CLAUDE_API_KEY from the environment.
 - The Google script prints model identifiers in a JSON-style fragment.
 - These scripts are minimal and are meant as a starting point for experiments.
