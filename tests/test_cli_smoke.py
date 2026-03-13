@@ -15,6 +15,7 @@ CLI_SCRIPT_PATHS = [
     "src/ai/providers/anthropic_chat.py",
     "src/ai/providers/openrouter_chat.py",
     "src/ai/providers/google_ai_studio.py",
+    "src/integrations/email/outlook_mailbox.py",
     "src/document_processing/conversion/markdown_to_docx.py",
     "src/document_processing/conversion/extracted_text_to_json.py",
     "src/document_processing/extraction/pdf_to_text.py",
