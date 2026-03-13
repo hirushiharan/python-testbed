@@ -24,6 +24,9 @@ src/
       anthropic_chat.py
       openrouter_chat.py
       google_ai_studio.py
+  integrations/
+    email/
+      outlook_mailbox.py
   document_processing/
     conversion/
       markdown_to_docx.py
@@ -116,6 +119,22 @@ Google model list (JSON file output):
 ```bash
 python src/ai/providers/google_ai_studio.py --json -o models.json
 google-models --json -o models.json
+```
+
+### Email Connectors
+
+Outlook mailbox data (Inbox and Sent Items):
+
+```bash
+python src/integrations/email/outlook_mailbox.py --json
+outlook-mailbox --json
+```
+
+Outlook mailbox data (all folders):
+
+```bash
+python src/integrations/email/outlook_mailbox.py --all-folders --max-per-folder 50 --json
+outlook-mailbox --all-folders --max-per-folder 50 --json
 ```
 
 ### Document Processing
