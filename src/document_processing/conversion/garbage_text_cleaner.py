@@ -54,6 +54,29 @@ def _try_parse_json_candidates(raw_text: str) -> Any:
     raise ValueError(f"Input is not valid JSON-like text ({detail})")
 
 
+def _clean_plain_text(raw_text: str) -> str:
+    """Clean and lightly format non-JSON text content."""
+    text = raw_text.replace("\ufeff", "")
+    text = text.replace("\\n", "\n").replace("\\t", "\t")
+    text = text.replace("\\\"", '"').replace("\\'", "'")
+    lines = [line.rstrip() for line in text.splitlines()]
+
+    cleaned_lines: list[str] = []
+    previous_blank = False
+    for line in lines:
+        compact = " ".join(line.split())
+        if not compact:
+            if not previous_blank:
+                cleaned_lines.append("")
+            previous_blank = True
+            continue
+
+        cleaned_lines.append(compact)
+        previous_blank = False
+
+    return "\n".join(cleaned_lines).strip()
+
+
 def _normalize_string(value: str) -> str:
     """Normalize string values by cleaning whitespace and date-like text."""
     trimmed = " ".join(value.split())
@@ -90,7 +113,10 @@ def _format_mapping(mapping: dict[str, Any], title: str) -> str:
 
 def clean_and_format_text(raw_text: str) -> str:
     """Return cleaned and formatted text from escaped JSON-like content."""
-    parsed = _try_parse_json_candidates(raw_text)
+    try:
+        parsed = _try_parse_json_candidates(raw_text)
+    except ValueError:
+        return _clean_plain_text(raw_text)
 
     if isinstance(parsed, list):
         blocks: list[str] = []
@@ -158,7 +184,7 @@ def main() -> int:
             raw_text = input_path.read_text(encoding="utf-8")
 
         cleaned_text = clean_and_format_text(raw_text)
-    except (FileNotFoundError, UnicodeDecodeError, ValueError, OSError) as exc:
+    except (FileNotFoundError, UnicodeDecodeError, OSError) as exc:
         logger.error("Text cleaning failed: %s", exc)
         return 1
 
