@@ -18,6 +18,7 @@ CLI_SCRIPT_PATHS = [
     "src/integrations/email/outlook_mailbox.py",
     "src/document_processing/conversion/markdown_to_docx.py",
     "src/document_processing/conversion/extracted_text_to_json.py",
+    "src/document_processing/conversion/garbage_text_cleaner.py",
     "src/document_processing/extraction/pdf_to_text.py",
     "src/document_processing/storage/delete_s3_bucket_documents.py",
     "src/security/tokens/generate_jwt_secret_key.py",
