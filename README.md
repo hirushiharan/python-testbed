@@ -160,6 +160,13 @@ python src/document_processing/conversion/extracted_text_to_json.py input.txt -o
 text-to-json-string input.txt -o output.json
 ```
 
+Clean and format garbage text:
+
+```bash
+python src/document_processing/conversion/garbage_text_cleaner.py --input raw.txt -o cleaned.txt
+clean-garbage-text --input raw.txt -o cleaned.txt
+```
+
 Delete S3 objects from bucket:
 
 ```bash
