@@ -33,6 +33,7 @@ src/
   integrations/
     email/
       outlook_mailbox.py
+    sharepoint/
   document_processing/
     conversion/
       markdown_to_docx.py
@@ -147,6 +148,17 @@ Outlook mailbox data (all folders):
 python src/integrations/email/outlook_mailbox.py --all-folders --max-per-folder 50 --json
 outlook-mailbox --all-folders --max-per-folder 50 --json
 ```
+
+### SharePoint API
+
+The FastAPI app in `src/auth/main.py` also exposes SharePoint document-library
+endpoints under `/api/v1/sharepoint`.
+
+Available operations:
+
+- `POST /api/v1/sharepoint/documents` to create a document folder
+- `GET /api/v1/sharepoint/documents/{folder_id}/files` to list files in a folder
+- `POST /api/v1/sharepoint/documents/{folder_id}/files` to upload a file to a folder
 
 ### Document Processing
 
