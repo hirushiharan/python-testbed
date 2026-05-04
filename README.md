@@ -19,6 +19,12 @@ The repository is organized by use case so each script is easy to locate and run
 
 ```text
 src/
+  auth/
+    api/
+    application/
+    domain/
+    infrastructure/
+    integrations/
   ai/
     providers/
       anthropic_chat.py
@@ -42,6 +48,11 @@ src/
     tokens/
       generate_jwt_secret_key.py
 ```
+
+## Auth Module
+
+The `src/auth` package mirrors the Microsoft Entra ID authentication flow used in the billing-ops backend.
+It exposes login URL generation, authorization-code exchange, bearer-token validation, and a user lookup endpoint backed by MySQL.
 
 ## Requirements
 
