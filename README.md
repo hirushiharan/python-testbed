@@ -19,6 +19,7 @@ The repository is organized by use case so each script is easy to locate and run
 
 ```text
 src/
+  main.py
   auth/
     api/
     application/
@@ -151,8 +152,14 @@ outlook-mailbox --all-folders --max-per-folder 50 --json
 
 ### SharePoint API
 
-The FastAPI app in `src/auth/main.py` also exposes SharePoint document-library
-endpoints under `/api/v1/sharepoint`.
+The FastAPI app in `src/main.py` exposes SharePoint document-library endpoints
+under `/api/v1/sharepoint`.
+
+Run the API:
+
+```bash
+uv run uvicorn src.main:app --reload
+```
 
 Available operations:
 
