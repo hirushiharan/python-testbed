@@ -1,1 +1,1 @@
-"""Email integration scripts."""
+"""Outlook email integration via Microsoft Graph."""
