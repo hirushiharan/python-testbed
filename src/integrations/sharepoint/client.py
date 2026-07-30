@@ -139,6 +139,56 @@ class SharePointGraphClient:
         self._drive_id = drive_id
         return drive_id
 
+    def list_drives(self) -> list[dict[str, Any]]:
+        """Return every document library (drive) available on the configured site."""
+
+        site_id = self.settings.sharepoint_site_id.strip()
+        if not site_id:
+            raise SharePointConfigurationError("sharepoint_site_id is required")
+
+        payload = self._request_json(
+            method="GET",
+            url=self._api_url(f"sites/{urllib.parse.quote(site_id)}/drives"),
+            headers=self._authorized_headers(),
+        )
+        return [item for item in payload.get("value", []) if isinstance(item, dict)]
+
+    def use_drive(self, drive_id: str) -> None:
+        """Override the drive used for subsequent calls, e.g. to target a non-default library."""
+
+        self._drive_id = drive_id.strip()
+
+    def resolve_drive_id_by_name(self, library_name: str) -> str:
+        """Look up a document library's drive ID by its display name (case-insensitive)."""
+
+        target = library_name.strip().casefold()
+        for drive in self.list_drives():
+            if str(drive.get("name", "")).strip().casefold() == target:
+                drive_id = str(drive.get("id", "")).strip()
+                if drive_id:
+                    return drive_id
+
+        raise SharePointClientError(f"No document library named {library_name!r} found on the configured site")
+
+    def get_item_id_by_path(self, path: str) -> str:
+        """Resolve a folder/file path (relative to the drive root) to its item ID."""
+
+        relative_path = path.strip().strip("/")
+        if not relative_path:
+            return "root"
+
+        drive_id = self.get_drive_id()
+        url = self._api_url(
+            f"drives/{urllib.parse.quote(drive_id)}/root:/{urllib.parse.quote(relative_path)}"
+        )
+        payload = self._request_json(method="GET", url=url, headers=self._authorized_headers())
+
+        item_id = str(payload.get("id", "")).strip()
+        if not item_id:
+            raise SharePointClientError(f"Could not resolve SharePoint item at path: {path!r}")
+
+        return item_id
+
     def create_folder(
         self,
         *,
@@ -171,7 +221,7 @@ class SharePointGraphClient:
             json_body=payload,
         )
 
-    def list_files(self, folder_id: str) -> list[dict[str, Any]]:
+    def _iter_children(self, folder_id: str) -> list[dict[str, Any]]:
         drive_id = self.get_drive_id()
         folder_ref = folder_id.strip()
         if not folder_ref:
@@ -187,21 +237,46 @@ class SharePointGraphClient:
             )
 
         url = f"{url}?$top=200&$select=id,name,size,webUrl,lastModifiedDateTime,parentReference,file,folder"
-        files: list[dict[str, Any]] = []
+        items: list[dict[str, Any]] = []
 
         while url:
             payload = self._request_json(method="GET", url=url, headers=self._authorized_headers())
             for item in payload.get("value", []):
-                if not isinstance(item, dict):
-                    continue
-                if item.get("file") is None:
-                    continue
-                files.append(item)
+                if isinstance(item, dict):
+                    items.append(item)
 
             next_link = str(payload.get("@odata.nextLink", "")).strip()
             url = next_link or ""
 
-        return files
+        return items
+
+    def list_files(self, folder_id: str) -> list[dict[str, Any]]:
+        return [item for item in self._iter_children(folder_id) if item.get("file") is not None]
+
+    def list_children(self, folder_id: str) -> list[dict[str, Any]]:
+        """Return every item (files and folders) directly inside ``folder_id``."""
+
+        return self._iter_children(folder_id)
+
+    def rename_item(self, item_id: str, new_name: str) -> dict[str, Any]:
+        """Rename a file or folder in place, preserving its location in the tree."""
+
+        item_ref = item_id.strip()
+        renamed_to = new_name.strip()
+        if not item_ref:
+            raise ValueError("item_id cannot be empty")
+        if not renamed_to:
+            raise ValueError("new_name cannot be empty")
+
+        drive_id = self.get_drive_id()
+        url = self._api_url(f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(item_ref)}")
+
+        return self._request_json(
+            method="PATCH",
+            url=url,
+            headers={**self._authorized_headers(), "Content-Type": "application/json"},
+            json_body={"name": renamed_to},
+        )
 
     def upload_file(self, folder_id: str, file_name: str, file_stream: Any) -> dict[str, Any]:
         drive_id = self.get_drive_id()
