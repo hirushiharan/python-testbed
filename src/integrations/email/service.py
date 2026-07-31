@@ -56,6 +56,7 @@ class OutlookService:
             MailFolderResponse(
                 id=str(f.get("id", "")),
                 display_name=str(f.get("displayName", "")),
+                parent_folder_id=str(f.get("parentFolderId", "")).strip() or None,
                 total_item_count=int(f.get("totalItemCount", 0) or 0),
                 unread_item_count=int(f.get("unreadItemCount", 0) or 0),
                 child_folder_count=int(f.get("childFolderCount", 0) or 0),

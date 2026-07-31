@@ -175,11 +175,9 @@ class OutlookGraphClient:
 
         return result
 
-    def list_mail_folders(self, mailbox: str) -> list[dict[str, Any]]:
-        """List all mail folders for a mailbox, following pagination."""
-        encoded = urllib.parse.quote(mailbox)
-        url: str = self._api_url(f"users/{encoded}/mailFolders?$top=200")
-        folders: list[dict[str, Any]] = []
+    def _paginated_get(self, url: str) -> list[dict[str, Any]]:
+        """Follow @odata.nextLink and collect all items in `value`."""
+        items: list[dict[str, Any]] = []
 
         while url:
             payload = self._request_json(
@@ -187,8 +185,37 @@ class OutlookGraphClient:
             )
             for item in payload.get("value", []):
                 if isinstance(item, dict):
-                    folders.append(item)
+                    items.append(item)
             url = str(payload.get("@odata.nextLink", "")).strip()
+
+        return items
+
+    def list_mail_folders(self, mailbox: str) -> list[dict[str, Any]]:
+        """List all mail folders for a mailbox, including nested child folders.
+
+        Graph's mailFolders endpoint only returns folders whose parent is the
+        mailbox root, so child folders are fetched recursively via
+        /mailFolders/{id}/childFolders for every folder with childFolderCount > 0.
+        """
+        encoded_mailbox = urllib.parse.quote(mailbox)
+        queue = self._paginated_get(
+            self._api_url(f"users/{encoded_mailbox}/mailFolders?$top=200")
+        )
+
+        folders: list[dict[str, Any]] = []
+        while queue:
+            folder = queue.pop(0)
+            folders.append(folder)
+            if int(folder.get("childFolderCount", 0) or 0) > 0:
+                encoded_folder = urllib.parse.quote(str(folder["id"]))
+                queue.extend(
+                    self._paginated_get(
+                        self._api_url(
+                            f"users/{encoded_mailbox}/mailFolders/"
+                            f"{encoded_folder}/childFolders?$top=200"
+                        )
+                    )
+                )
 
         return folders
 

@@ -26,6 +26,7 @@ class MailFolderResponse(BaseModel):
 
     id: str
     display_name: str
+    parent_folder_id: str | None = None
     total_item_count: int = 0
     unread_item_count: int = 0
     child_folder_count: int = 0
