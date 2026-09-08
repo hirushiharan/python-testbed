@@ -233,7 +233,7 @@ class OutlookGraphClient:
         encoded_folder = urllib.parse.quote(folder_id)
         select_fields = (
             "id,subject,from,toRecipients,receivedDateTime,sentDateTime,"
-            "isRead,hasAttachments,bodyPreview,webLink,parentFolderId"
+            "isRead,hasAttachments,bodyPreview,body,webLink,parentFolderId"
         )
         page_size = min(max_messages, 100)
         url: str = self._api_url(

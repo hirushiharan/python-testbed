@@ -42,3 +42,5 @@ class MailMessageResponse(BaseModel):
     is_read: bool = False
     has_attachments: bool = False
     body_preview: str | None = None
+    body_content_type: str | None = None
+    body_content: str | None = None

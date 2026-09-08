@@ -90,6 +90,8 @@ class OutlookService:
                 except ValueError:
                     pass
 
+            body_obj = m.get("body") or {}
+
             result.append(
                 MailMessageResponse(
                     id=str(m.get("id", "")),
@@ -99,6 +101,8 @@ class OutlookService:
                     is_read=bool(m.get("isRead", False)),
                     has_attachments=bool(m.get("hasAttachments", False)),
                     body_preview=str(m.get("bodyPreview", "")).strip() or None,
+                    body_content_type=str(body_obj.get("contentType", "")).strip() or None,
+                    body_content=str(body_obj.get("content", "")).strip() or None,
                 )
             )
 
