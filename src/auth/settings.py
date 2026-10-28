@@ -33,7 +33,9 @@ class Settings(BaseSettings):
     entra_allow_multi_tenant: bool = False
     entra_issuer: str | None = Field(default=None, description="Explicit issuer override")
     entra_jwks_url: str | None = Field(default=None, description="Explicit JWKS URL override")
-    entra_token_url: str | None = Field(default=None, description="Explicit token endpoint override")
+    entra_token_url: str | None = Field(
+        default=None, description="Explicit token endpoint override"
+    )
     entra_redirect_uri: str = "http://localhost:8000/api/v1/auth/callback"
     entra_auth_scopes: str = "openid,profile,email,offline_access"
     entra_required_scopes: str | None = Field(default=None, description="Required API scopes")

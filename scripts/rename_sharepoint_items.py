@@ -22,7 +22,10 @@ from typing import Any, Callable
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.integrations.sharepoint.client import SharePointClientError, SharePointGraphClient  # noqa: E402
+from src.integrations.sharepoint.client import (  # noqa: E402
+    SharePointClientError,
+    SharePointGraphClient,
+)
 
 _SEPARATOR_RE = re.compile(r"[\s_\-]+")
 _LOWER_UPPER_BOUNDARY_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
@@ -41,7 +44,9 @@ def tokenize(name: str) -> list[str]:
 NAMING_STRATEGIES: dict[str, Callable[[list[str]], str]] = {
     "snake_case": lambda tokens: "_".join(t.lower() for t in tokens),
     "kebab_case": lambda tokens: "-".join(t.lower() for t in tokens),
-    "camel_case": lambda tokens: (tokens[0].lower() + "".join(t.capitalize() for t in tokens[1:])) if tokens else "",
+    "camel_case": lambda tokens: (
+        (tokens[0].lower() + "".join(t.capitalize() for t in tokens[1:])) if tokens else ""
+    ),
     "pascal_case": lambda tokens: "".join(t.capitalize() for t in tokens),
     "title_case": lambda tokens: " ".join(t.capitalize() for t in tokens),
     "constant_case": lambda tokens: "_".join(t.upper() for t in tokens),
@@ -108,7 +113,9 @@ def build_rename_plan(
     return plan
 
 
-def apply_rename_plan(client: SharePointGraphClient, plan: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def apply_rename_plan(
+    client: SharePointGraphClient, plan: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
 
     for entry in plan:
@@ -123,11 +130,14 @@ def apply_rename_plan(client: SharePointGraphClient, plan: list[dict[str, Any]])
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         "--library",
         default=None,
-        help="Name of the document library to target, e.g. 'Projects' (default: the library from SHAREPOINT_DRIVE_ID/site default).",
+        help="Name of the document library to target, e.g. 'Projects' "
+        "(default: the library from SHAREPOINT_DRIVE_ID/site default).",
     )
     root_group = parser.add_mutually_exclusive_group()
     root_group.add_argument(
@@ -150,7 +160,8 @@ def main() -> None:
         "--target",
         choices=["files", "folders", "both"],
         default="both",
-        help="Limit renaming to files only, folders only, or both (default: both). Folders are still traversed either way.",
+        help="Limit renaming to files only, folders only, or both (default: both). "
+        "Folders are still traversed either way.",
     )
     parser.add_argument(
         "--apply",

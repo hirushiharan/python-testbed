@@ -21,7 +21,8 @@ from src.auth.application.errors import (
 )
 from src.auth.domain.errors import AuthAuthorizationError
 from src.auth.domain.roles import normalize_role
-from src.auth.infrastructure.repository import AuthRepository, AuthRepositoryError as RepositoryAuthError
+from src.auth.infrastructure.repository import AuthRepository
+from src.auth.infrastructure.repository import AuthRepositoryError as RepositoryAuthError
 from src.auth.integrations.entra_id_adapter import InvalidAccessTokenError
 from src.auth.integrations.oauth_adapter import EntraOAuthClient, EntraOAuthError
 
@@ -107,7 +108,8 @@ class AuthService:
             email=email,
             role=normalized_role,
             is_active=True,
-            name=self._as_str_or_none(claims.get("name")) or self._as_str_or_none(claims.get("given_name")),
+            name=self._as_str_or_none(claims.get("name"))
+            or self._as_str_or_none(claims.get("given_name")),
         )
 
     def _exchange_token_payload(self, code: str) -> dict[str, Any]:

@@ -40,4 +40,3 @@ class SharePointFileResponse(SharePointItemResponse):
 
 class UploadResponse(SharePointFileResponse):
     """Response returned after a file upload completes."""
-

@@ -70,7 +70,8 @@ class SharePointGraphClient:
 
         if response.status_code >= 400:
             raise SharePointClientError(
-                f"Graph request failed ({response.status_code}): {response.text.strip() or response.reason}"
+                f"Graph request failed ({response.status_code}): "
+                f"{response.text.strip() or response.reason}"
             )
 
         if not response.content:
@@ -85,7 +86,11 @@ class SharePointGraphClient:
 
     def _get_access_token(self) -> str:
         now = dt.datetime.utcnow()
-        if self._access_token and self._access_token_expires_at and now < self._access_token_expires_at:
+        if (
+            self._access_token
+            and self._access_token_expires_at
+            and now < self._access_token_expires_at
+        ):
             return self._access_token
 
         form_data = {
@@ -168,7 +173,9 @@ class SharePointGraphClient:
                 if drive_id:
                     return drive_id
 
-        raise SharePointClientError(f"No document library named {library_name!r} found on the configured site")
+        raise SharePointClientError(
+            f"No document library named {library_name!r} found on the configured site"
+        )
 
     def get_item_id_by_path(self, path: str) -> str:
         """Resolve a folder/file path (relative to the drive root) to its item ID."""
@@ -200,7 +207,9 @@ class SharePointGraphClient:
             raise ValueError("Folder name cannot be empty")
 
         drive_id = self.get_drive_id()
-        parent_id = (parent_folder_id or self.settings.sharepoint_default_parent_folder_id or "").strip()
+        parent_id = (
+            parent_folder_id or self.settings.sharepoint_default_parent_folder_id or ""
+        ).strip()
         folder_name = name.strip()
         payload = {
             "name": folder_name,
@@ -210,7 +219,9 @@ class SharePointGraphClient:
         }
 
         if parent_id:
-            endpoint = self._api_url(f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(parent_id)}/children")
+            endpoint = self._api_url(
+                f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(parent_id)}/children"
+            )
         else:
             endpoint = self._api_url(f"drives/{urllib.parse.quote(drive_id)}/root/children")
 
@@ -228,15 +239,16 @@ class SharePointGraphClient:
             raise ValueError("folder_id cannot be empty")
 
         if folder_ref.casefold() == "root":
-            url = self._api_url(
-                f"drives/{urllib.parse.quote(drive_id)}/root/children"
-            )
+            url = self._api_url(f"drives/{urllib.parse.quote(drive_id)}/root/children")
         else:
             url = self._api_url(
                 f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(folder_ref)}/children"
             )
 
-        url = f"{url}?$top=200&$select=id,name,size,webUrl,lastModifiedDateTime,parentReference,file,folder"
+        url = (
+            f"{url}?$top=200"
+            "&$select=id,name,size,webUrl,lastModifiedDateTime,parentReference,file,folder"
+        )
         items: list[dict[str, Any]] = []
 
         while url:
@@ -269,7 +281,9 @@ class SharePointGraphClient:
             raise ValueError("new_name cannot be empty")
 
         drive_id = self.get_drive_id()
-        url = self._api_url(f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(item_ref)}")
+        url = self._api_url(
+            f"drives/{urllib.parse.quote(drive_id)}/items/{urllib.parse.quote(item_ref)}"
+        )
 
         return self._request_json(
             method="PATCH",
@@ -321,7 +335,9 @@ class SharePointGraphClient:
         if total_size <= 0:
             raise ValueError("Cannot upload an empty file")
 
-        chunk_size = max(1, int(self.settings.sharepoint_upload_chunk_size or UPLOAD_SESSION_CHUNK_SIZE))
+        chunk_size = max(
+            1, int(self.settings.sharepoint_upload_chunk_size or UPLOAD_SESSION_CHUNK_SIZE)
+        )
         start = 0
         last_response: requests.Response | None = None
 
@@ -352,7 +368,8 @@ class SharePointGraphClient:
 
             if last_response.status_code != 202:
                 raise SharePointClientError(
-                    f"Upload session failed ({last_response.status_code}): {last_response.text.strip() or last_response.reason}"
+                    f"Upload session failed ({last_response.status_code}): "
+                    f"{last_response.text.strip() or last_response.reason}"
                 )
 
             start = end + 1

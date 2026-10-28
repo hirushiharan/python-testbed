@@ -35,6 +35,9 @@ src/
     email/
       outlook_mailbox.py
     sharepoint/
+  aws_inventory/
+    cli.py
+    collectors/
   document_processing/
     conversion/
       markdown_to_docx.py
@@ -218,6 +221,41 @@ python src/document_processing/storage/delete_s3_bucket_documents.py your-bucket
 s3-delete-objects your-bucket --yes
 ```
 
+### AWS Account Inventory (read-only)
+
+Inventory every service in an AWS account across all enabled regions, grouped by service, with
+status, last activity, dependencies and metadata. Output is JSON (full detail) and/or Excel
+(Summary, Dependencies, Errors and one sheet per service).
+
+Log in with the AWS CLI first (`aws login`, `aws sso login --profile <name>` or `aws configure`).
+The account ID must match the credentials, or use `--role-name` to assume a role into it.
+
+```bash
+python src/aws_inventory/cli.py 123456789012
+aws-inventory 123456789012 --profile prod --format xlsx
+aws-inventory 123456789012 --role-name OrganizationAccountAccessRole
+aws-inventory 123456789012 --regions us-east-1,eu-west-1 --services ec2,s3,lambda
+aws-inventory 123456789012 --skip-cost
+```
+
+Notes:
+- Strictly read-only: only List/Describe/Get calls, plus STS to identify/assume a role.
+  `ReadOnlyAccess` + `SecurityAudit` is enough; Cost Explorer needs `ce:GetCostAndUsage`
+  (about $0.01 per request, skip with `--skip-cost`).
+- Deep collectors: ec2 (incl. VPC/NAT), s3, rds, lambda, iam, ecs, eks, dynamodb, elbv2,
+  cloudfront, apigateway, sqs, sns. Other services are picked up as `unknown`-status stubs via
+  the Resource Groups Tagging API and Resource Explorer (if an aggregator index exists), and
+  Cost Explorer flags billed services with no collector (`coverage.billed_without_collector`).
+- `last_activity` is only available where AWS exposes it (CloudWatch metrics over the last 30
+  days, IAM last-used); `null` means none observed or no signal. `is_active` is state-based for
+  resources with a lifecycle state and activity-based otherwise.
+- Dependencies come from each resource's describe response, not a full cross-service graph.
+- Every run writes a detailed DEBUG log next to the output (`aws-inventory-<account>-<time>.log`): per-API-call
+  timings, START/DONE lines per service/region, a 30s heartbeat showing what each running task is doing, and an
+  end-of-run report (slowest tasks, retries, throttling). Calls have 10s connect / 30s read timeouts; Ctrl+C
+  stops promptly. Request parameters and credentials are never logged.
+- Output files contain account details; they are written to `aws-inventory-output/` (git-ignored).
+
 ### Security Utility
 
 Generate JWT secret:
@@ -283,6 +321,7 @@ Rules:
 ## Safety Notes
 
 - The S3 deletion utility is destructive. Always test with --prefix first.
+- The AWS inventory utility never modifies AWS resources.
 - Keep API keys in .env, never commit secrets.
 - Run with --verbose when debugging production issues.
 
