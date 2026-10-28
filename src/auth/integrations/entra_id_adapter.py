@@ -7,13 +7,15 @@ from functools import lru_cache
 from typing import Any
 
 import jwt
-from jwt import ExpiredSignatureError
-from jwt import ImmatureSignatureError
-from jwt import InvalidAudienceError
-from jwt import InvalidIssuerError
+from jwt import (
+    ExpiredSignatureError,
+    ImmatureSignatureError,
+    InvalidAudienceError,
+    InvalidIssuerError,
+    MissingRequiredClaimError,
+    PyJWKClient,
+)
 from jwt import InvalidTokenError as PyJwtInvalidTokenError
-from jwt import MissingRequiredClaimError
-from jwt import PyJWKClient
 
 from src.auth.settings import Settings, get_settings
 
@@ -68,7 +70,10 @@ class EntraTokenValidator:
             raise InvalidAccessTokenError("Invalid or expired access token") from exc
 
         tenant_claim = claims.get("tid")
-        if not self.settings.entra_allow_multi_tenant and tenant_claim != self.settings.entra_tenant_id:
+        if (
+            not self.settings.entra_allow_multi_tenant
+            and tenant_claim != self.settings.entra_tenant_id
+        ):
             raise InvalidAccessTokenError("Token tenant does not match configured tenant")
 
         self._validate_access_claims(claims)
@@ -85,9 +90,7 @@ class EntraTokenValidator:
         granted_roles: set[str] = set()
         if isinstance(roles_claim, list):
             granted_roles = {
-                item.strip()
-                for item in roles_claim
-                if isinstance(item, str) and item.strip()
+                item.strip() for item in roles_claim if isinstance(item, str) and item.strip()
             }
 
         if not granted_scopes and not granted_roles:

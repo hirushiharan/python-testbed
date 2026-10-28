@@ -29,7 +29,9 @@ def _map_sharepoint_error(exc: Exception) -> HTTPException:
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
     if isinstance(exc, SharePointClientError):
         return HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc))
-    return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected SharePoint error")
+    return HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected SharePoint error"
+    )
 
 
 @router.post("/documents", response_model=SharePointDocumentResponse)

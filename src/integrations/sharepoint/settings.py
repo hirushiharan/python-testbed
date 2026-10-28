@@ -39,7 +39,8 @@ class SharePointSettings(BaseSettings):
     )
     sharepoint_drive_id: str | None = Field(
         default=None,
-        description="Optional drive ID for the document library; resolved from the site when omitted",
+        description="Optional drive ID for the document library; "
+        "resolved from the site when omitted",
     )
     sharepoint_default_parent_folder_id: str | None = Field(
         default=None,
