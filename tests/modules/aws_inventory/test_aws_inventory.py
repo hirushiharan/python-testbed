@@ -46,7 +46,7 @@ class StubbedContext(Context):
 
 def test_account_id_must_be_twelve_digits() -> None:
     assert account_id_type(ACCOUNT) == ACCOUNT
-    for bad in ("123", "12345678901a", "1234567890123"):
+    for bad in ("123", "12345678901a", "1234567890123"):  # pragma: allowlist secret
         with pytest.raises(Exception):
             account_id_type(bad)
     assert parse_args([ACCOUNT, "--regions", "us-east-1, eu-west-1"]).regions == [
@@ -324,7 +324,7 @@ class FakeAwsContext(Context):
                 service,
                 region_name=key[1],
                 aws_access_key_id="test",
-                aws_secret_access_key="test",
+                aws_secret_access_key="test",  # pragma: allowlist secret
             )
 
             def handler(model: Any, **_: Any) -> tuple[AWSResponse, dict[str, Any]]:
@@ -404,7 +404,9 @@ def test_lambda_collector_activity_based_active_flag() -> None:
                         "FunctionArn": fn_arn,
                         "Runtime": "python3.12",
                         "Role": f"arn:aws:iam::{ACCOUNT}:role/r",
-                        "Environment": {"Variables": {"SECRET": "do-not-leak"}},
+                        "Environment": {
+                            "Variables": {"SECRET": "do-not-leak"},  # pragma: allowlist secret
+                        },
                     }
                 ]
             },

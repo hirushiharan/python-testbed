@@ -103,7 +103,7 @@ def _users(ctx: Context, region: str) -> list[Resource]:
             metadata={
                 "access_keys": key_info,
                 "mfa_enabled": bool(mfa) if mfa is not None else None,
-                "has_console_password": "PasswordLastUsed" in user,
+                "has_console_password": "PasswordLastUsed" in user,  # pragma: allowlist secret
             },
             dependencies=deps(*[dep("attached-policy", p["PolicyArn"], SERVICE) for p in attached]),
         )
