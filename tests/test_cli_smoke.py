@@ -21,6 +21,7 @@ CLI_SCRIPT_PATHS = [
     "src/document_processing/conversion/garbage_text_cleaner.py",
     "src/document_processing/extraction/pdf_to_text.py",
     "src/document_processing/storage/delete_s3_bucket_documents.py",
+    "src/aws_inventory/cli.py",
     "src/security/tokens/generate_jwt_secret_key.py",
     "src/project_structure/create_structure_from_json.py",
     "src/project_structure/export_project_structure.py",
