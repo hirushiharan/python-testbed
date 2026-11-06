@@ -177,6 +177,59 @@ class SharePointGraphClient:
             f"No document library named {library_name!r} found on the configured site"
         )
 
+    def find_drive_by_name(self, library_name: str) -> dict[str, Any] | None:
+        """Return the drive resource whose name matches ``library_name``, or ``None``."""
+
+        target = library_name.strip().casefold()
+        for drive in self.list_drives():
+            if str(drive.get("name", "")).strip().casefold() == target:
+                return drive
+        return None
+
+    def create_document_library(
+        self, display_name: str, description: str | None = None
+    ) -> dict[str, Any]:
+        """Create a document library on the configured site and return its drive resource.
+
+        Idempotent: if a library with the same name (case-insensitive) already exists, that
+        drive is returned unchanged and nothing is created. Requires the Graph application
+        permission ``Sites.ReadWrite.All`` (or ``Sites.Manage.All``).
+        """
+
+        name = display_name.strip()
+        if not name:
+            raise ValueError("display_name cannot be empty")
+
+        site_id = self.settings.sharepoint_site_id.strip()
+        if not site_id:
+            raise SharePointConfigurationError("sharepoint_site_id is required")
+
+        existing = self.find_drive_by_name(name)
+        if existing is not None:
+            return existing
+
+        body: dict[str, Any] = {"displayName": name, "list": {"template": "documentLibrary"}}
+        if description:
+            body["description"] = description
+
+        created = self._request_json(
+            method="POST",
+            url=self._api_url(f"sites/{urllib.parse.quote(site_id)}/lists"),
+            headers={**self._authorized_headers(), "Content-Type": "application/json"},
+            json_body=body,
+        )
+        list_id = str(created.get("id", "")).strip()
+        if not list_id:
+            raise SharePointClientError("Graph did not return an ID for the new library")
+
+        return self._request_json(
+            method="GET",
+            url=self._api_url(
+                f"sites/{urllib.parse.quote(site_id)}/lists/{urllib.parse.quote(list_id)}/drive"
+            ),
+            headers=self._authorized_headers(),
+        )
+
     def get_item_id_by_path(self, path: str) -> str:
         """Resolve a folder/file path (relative to the drive root) to its item ID."""
 
