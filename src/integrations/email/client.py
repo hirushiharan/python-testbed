@@ -219,6 +219,43 @@ class OutlookGraphClient:
 
         return folders
 
+    def send_mail(
+        self,
+        mailbox: str,
+        *,
+        to: list[str],
+        subject: str,
+        body: str,
+        body_content_type: str = "Text",
+        cc: list[str] | None = None,
+        save_to_sent_items: bool = True,
+    ) -> None:
+        """Send a message as `mailbox` via POST /users/{mailbox}/sendMail.
+
+        Requires the Mail.Send application permission (admin-consented). Graph
+        responds 202 Accepted with an empty body on success.
+        """
+        if not to:
+            raise ValueError("At least one recipient is required")
+
+        def _recipients(addresses: list[str]) -> list[dict[str, Any]]:
+            return [{"emailAddress": {"address": a.strip()}} for a in addresses if a.strip()]
+
+        message: dict[str, Any] = {
+            "subject": subject,
+            "body": {"contentType": body_content_type, "content": body},
+            "toRecipients": _recipients(to),
+        }
+        if cc:
+            message["ccRecipients"] = _recipients(cc)
+
+        self._request_json(
+            method="POST",
+            url=self._api_url(f"users/{urllib.parse.quote(mailbox)}/sendMail"),
+            headers=self._authorized_headers(),
+            json_body={"message": message, "saveToSentItems": save_to_sent_items},
+        )
+
     def fetch_messages(
         self,
         mailbox: str,

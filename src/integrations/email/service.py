@@ -9,6 +9,8 @@ from src.integrations.email.schemas import (
     MailFolderResponse,
     MailMessageResponse,
     OutlookConnectionStatus,
+    SendMailRequest,
+    SendMailResponse,
 )
 
 
@@ -64,6 +66,26 @@ class OutlookService:
             for f in raw_folders
             if f.get("id")
         ]
+
+    def send_mail(self, payload: SendMailRequest) -> SendMailResponse:
+        """Send an email from the configured mailbox."""
+        mailbox = self._require_mailbox()
+        self.client.send_mail(
+            mailbox,
+            to=payload.to,
+            cc=payload.cc,
+            subject=payload.subject,
+            body=payload.body,
+            body_content_type=payload.body_content_type,
+            save_to_sent_items=payload.save_to_sent_items,
+        )
+        return SendMailResponse(
+            accepted=True,
+            sender=mailbox,
+            to=payload.to,
+            subject=payload.subject,
+            sent_at=dt.datetime.now(dt.timezone.utc),
+        )
 
     def fetch_messages(
         self,

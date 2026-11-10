@@ -9,6 +9,8 @@ from src.integrations.email.schemas import (
     MailFolderResponse,
     MailMessageResponse,
     OutlookConnectionStatus,
+    SendMailRequest,
+    SendMailResponse,
 )
 from src.integrations.email.service import OutlookService, OutlookServiceError
 
@@ -45,6 +47,21 @@ def test_connection(
     """
     try:
         return service.test_connection()
+    except Exception as exc:
+        raise _map_outlook_error(exc) from exc
+
+
+@router.post("/send-test", response_model=SendMailResponse)
+def send_test_email(
+    payload: SendMailRequest,
+    service: OutlookService = Depends(get_outlook_service),
+) -> SendMailResponse:
+    """Send a test email from the configured mailbox via Microsoft Graph.
+
+    Requires the Mail.Send application permission on the Entra app.
+    """
+    try:
+        return service.send_mail(payload)
     except Exception as exc:
         raise _map_outlook_error(exc) from exc
 
