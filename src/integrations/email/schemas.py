@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class OutlookConnectionStatus(BaseModel):
@@ -19,6 +20,27 @@ class OutlookConnectionStatus(BaseModel):
     mailbox: str | None = None
     error: str | None = None
     checked_at: datetime
+
+
+class SendMailRequest(BaseModel):
+    """Request body for sending a test email."""
+
+    to: list[str] = Field(..., min_length=1, description="Recipient email addresses")
+    cc: list[str] = Field(default_factory=list)
+    subject: str = "Test email from python-testbed"
+    body: str = "This is a test email sent via the Microsoft Graph API."
+    body_content_type: Literal["Text", "HTML"] = "Text"
+    save_to_sent_items: bool = True
+
+
+class SendMailResponse(BaseModel):
+    """Confirmation that Graph accepted the message for delivery."""
+
+    accepted: bool
+    sender: str
+    to: list[str]
+    subject: str
+    sent_at: datetime
 
 
 class MailFolderResponse(BaseModel):

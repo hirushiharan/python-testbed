@@ -153,6 +153,52 @@ python src/integrations/email/outlook_mailbox.py --all-folders --max-per-folder 
 outlook-mailbox --all-folders --max-per-folder 50 --json
 ```
 
+### Outlook API
+
+The FastAPI app in `src/main.py` exposes Outlook (Microsoft Graph) endpoints
+under `/api/v1/outlook`. Mail is sent from, and read from, the mailbox set in
+`OUTLOOK_MAILBOX`.
+
+Run the API and open Swagger UI at <http://127.0.0.1:8000/docs>:
+
+```bash
+uv sync
+uv run uvicorn src.main:app --reload
+```
+
+Available operations:
+
+- `GET /api/v1/outlook/test-connection` to verify Graph credentials and mailbox access
+- `POST /api/v1/outlook/send-test` to send a test email from the configured mailbox
+- `GET /api/v1/outlook/folders` to list mail folders
+- `GET /api/v1/outlook/folders/{folder_id}/messages` to list messages in a folder
+
+Send a test email (in Swagger: expand `POST /api/v1/outlook/send-test` →
+**Try it out** → edit the body → **Execute**):
+
+```json
+{
+  "to": ["recipient@example.com"],
+  "subject": "Test email from python-testbed",
+  "body": "This is a test email sent via the Microsoft Graph API."
+}
+```
+
+Only `to` is required. Optional fields: `cc`, `body_content_type` (`Text` or
+`HTML`) and `save_to_sent_items`. A successful call returns `accepted: true`.
+
+Or from the command line:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/outlook/send-test \
+  -H "Content-Type: application/json" \
+  -d '{"to":["recipient@example.com"]}'
+```
+
+Sending with app-only auth requires the **`Mail.Send`** application permission
+(with admin consent) on the Entra app. A `502` containing `403` / `Access is
+denied` means the permission or an Exchange application access policy is missing.
+
 ### SharePoint API
 
 The FastAPI app in `src/main.py` exposes SharePoint document-library endpoints
