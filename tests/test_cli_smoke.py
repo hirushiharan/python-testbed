@@ -13,6 +13,7 @@ PYTHON = sys.executable
 
 CLI_SCRIPT_PATHS = [
     "src/ai/providers/anthropic_chat.py",
+    "src/ai/providers/anthropic_usage.py",
     "src/ai/providers/openrouter_chat.py",
     "src/ai/providers/google_ai_studio.py",
     "src/integrations/email/outlook_mailbox.py",

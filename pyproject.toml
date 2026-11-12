@@ -24,6 +24,7 @@ dependencies = [
 
 [project.scripts]
 anthropic-chat = "src.ai.providers.anthropic_chat:main"
+anthropic-usage = "src.ai.providers.anthropic_usage:main"
 openrouter-chat = "src.ai.providers.openrouter_chat:main"
 google-models = "src.ai.providers.google_ai_studio:main"
 outlook-mailbox = "src.integrations.email.outlook_mailbox:main"

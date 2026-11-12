@@ -29,6 +29,7 @@ src/
   ai/
     providers/
       anthropic_chat.py
+      anthropic_usage.py
       openrouter_chat.py
       google_ai_studio.py
   integrations/
@@ -115,6 +116,28 @@ Anthropic chat:
 python src/ai/providers/anthropic_chat.py
 anthropic-chat
 ```
+
+Anthropic organization usage and cost (requires an organization Admin API key):
+
+```bash
+python src/ai/providers/anthropic_usage.py --starting-at 2026-11-01T00:00:00Z
+anthropic-usage --starting-at 2026-11-01T00:00:00Z --json
+```
+
+This uses Anthropic's Usage and Cost Analytics API to report token usage and
+cost for the selected period. Anthropic does not document a public API for the
+remaining Console credit balance; the command reports that value as
+unavailable instead of treating usage or cost as a balance.
+
+The same report is available through the FastAPI Swagger UI:
+
+```bash
+uv run uvicorn src.main:app --reload
+```
+
+Open <http://127.0.0.1:8000/docs> and use
+`GET /api/v1/anthropic/usage`. The server reads
+`ANTHROPIC_ADMIN_API_KEY` from its environment.
 
 OpenRouter chat:
 
